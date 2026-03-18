@@ -197,7 +197,7 @@ if (productCard) cardObserver.observe(productCard);
 // ─── Upload Zone Click ──────────────────────────────────
 document.getElementById('upload-zone')?.addEventListener('click', () => {
   // In a real app, trigger <input type="file">
-  console.log('[Anti-Gravity] Upload triggered.');
+  console.log('[AI Editor] Upload triggered.');
 });
 
 
@@ -218,3 +218,24 @@ window.addEventListener('load', () => {
     document.querySelector('.nav-link[href="#home"]')?.classList.add('active');
   }
 });
+
+
+// ─── Feature Cards Staggered Entrance ──────────────────
+const featCards = document.querySelectorAll('.feat-card');
+
+const featObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const card  = entry.target;
+      const index = [...featCards].indexOf(card);
+      // Stagger: each card waits 80ms more than the previous
+      setTimeout(() => {
+        card.classList.add('is-visible');
+      }, index * 80);
+      featObserver.unobserve(card);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+featCards.forEach(card => featObserver.observe(card));
+
