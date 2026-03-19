@@ -26,7 +26,7 @@ window.addEventListener('scroll', () => {
 
 
 // ─── Active Nav Link on Scroll ──────────────────────────
-const sections = ['home', 'features', 'how-it-works', 'pricing'];
+const sections = ['home', 'remove-now', 'features', 'how-it-works', 'pricing'];
 const navLinks  = document.querySelectorAll('.nav-link');
 
 const observerOptions = { root: null, rootMargin: '-40% 0px -55% 0px', threshold: 0 };
@@ -238,4 +238,21 @@ const featObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
 featCards.forEach(card => featObserver.observe(card));
+
+
+// ─── Remove Now Selection Handling ─────────────────────
+const selectionCards = document.querySelectorAll('.selection-card');
+
+selectionCards.forEach(card => {
+  card.addEventListener('click', () => {
+    // Remove active from others
+    selectionCards.forEach(c => c.classList.remove('active'));
+    // Add to clicked
+    card.classList.add('active');
+    
+    // Smooth scroll slightly if needed or just provide visual feedback
+    console.log(`[AI Editor] Selection changed: ${card.id}`);
+  });
+});
+
 
