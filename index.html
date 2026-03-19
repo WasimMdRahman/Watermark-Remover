@@ -11,6 +11,12 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- ───────────── BACKGROUND ANIMATION ───────────── -->
+  <canvas id="network-canvas" class="network-canvas"></canvas>
+
+  <!-- Hidden File Input for Selection Cards -->
+  <input type="file" id="media-picker" style="display: none;" multiple>
+
 
   <!-- ───────────── NAVIGATION BAR ───────────── -->
   <header class="navbar" id="navbar">
@@ -543,6 +549,117 @@
     </div>
   </footer>
 
+
+  <script>
+    // ─── Neural Network Animation ─────────────────────────────
+    (function initNetwork() {
+      const canvas = document.getElementById('network-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      
+      let w, h, particles;
+      const particleCount = 100;
+      const connectionDist = 180;
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      
+      window.addEventListener('resize', resize);
+
+      class Particle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * w;
+          this.y = Math.random() * h;
+          this.vx = (Math.random() - 0.5) * 0.8;
+          this.vy = (Math.random() - 0.5) * 0.8;
+          this.size = Math.random() * 2 + 1;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0 || this.x > w) this.vx *= -1;
+          if (this.y < 0 || this.y > h) this.vy *= -1;
+        }
+        draw() {
+          // Lighter grey for visibility
+          ctx.fillStyle = 'rgba(160, 160, 160, 0.4)';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function connect() {
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < connectionDist) {
+              const opacity = 1 - (dist / connectionDist);
+              ctx.strokeStyle = `rgba(180, 180, 180, ${opacity * 0.3})`;
+              ctx.lineWidth = 0.8;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, w, h);
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+        connect();
+        requestAnimationFrame(animate);
+      }
+
+      resize();
+      particles = Array.from({ length: particleCount }, () => new Particle());
+      animate();
+    })();
+
+
+    // ─── Selection Cards & File Picker ────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+      const selectionCards = document.querySelectorAll('.selection-card');
+      const mediaPicker    = document.getElementById('media-picker');
+
+      const typeConfig = {
+        'select-images': 'image/*',
+        'select-videos': 'video/*',
+        'select-pdfs':   '.pdf'
+      };
+
+      selectionCards.forEach(card => {
+        card.addEventListener('click', () => {
+          selectionCards.forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          if (mediaPicker) {
+            mediaPicker.accept = typeConfig[card.id] || '*/*';
+            mediaPicker.click();
+          }
+          console.log(`[AI Editor] Picking files for: ${card.id}`);
+        });
+      });
+      
+      mediaPicker?.addEventListener('change', (e) => {
+        console.log(`[AI Editor] Files selected: ${e.target.files.length} items`);
+      });
+    });
+  </script>
+
   <script src="script.js"></script>
 </body>
 </html>
+

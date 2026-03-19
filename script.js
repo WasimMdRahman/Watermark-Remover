@@ -240,19 +240,6 @@ const featObserver = new IntersectionObserver((entries) => {
 featCards.forEach(card => featObserver.observe(card));
 
 
-// ─── Remove Now Selection Handling ─────────────────────
-const selectionCards = document.querySelectorAll('.selection-card');
 
-selectionCards.forEach(card => {
-  card.addEventListener('click', () => {
-    // Remove active from others
-    selectionCards.forEach(c => c.classList.remove('active'));
-    // Add to clicked
-    card.classList.add('active');
-    
-    // Smooth scroll slightly if needed or just provide visual feedback
-    console.log(`[AI Editor] Selection changed: ${card.id}`);
-  });
-});
 
 
